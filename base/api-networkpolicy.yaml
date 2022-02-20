@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: commerce-services-api
+  labels:
+    service: api
+    app: commerce-services
+spec:
+  podSelector:
+    matchLabels:
+      service: api
+      app: commerce-services
+  policyTypes:
+  - Egress
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    - port: 53
+      protocol: TCP
+  # we can block destination - to:
+  - ports:
+    - protocol: TCP #DynamoDB
+      port: 443
+    to:
+    - ipBlock:
+        cidr: 13.34.66.0/27 # us-east-1
+  - ports:
+    - port: 3306 # RDS 
+      protocol: TCP
+    to:
+    - ipBlock:
+        cidr: 172.1.1.0/24
+  - ports:
+    - port: 80 # web 
+      protocol: TCP
+---

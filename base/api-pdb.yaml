@@ -1,0 +1,13 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: commerce-services-api
+  labels:
+    service: api
+    app: commerce-services
+spec:
+  maxUnavailable: 50%
+  selector:
+    matchLabels:
+      service: api
+      app: commerce-services

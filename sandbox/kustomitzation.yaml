@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: sandbox
+commonLabels:
+  env: sandbox
+  app: commerce-services
+namePrefix: sandbox-
+bases:
+  - ../base
+resources:
+  - namespace.yaml
+patchesStrategicMerge:
+  - api-ingress.yaml
+  - static-ingress.yaml

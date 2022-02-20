@@ -1,0 +1,13 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: commerce-services-static
+  labels:
+    service: static
+    app: commerce-services
+spec:
+  maxUnavailable: 50%
+  selector:
+    matchLabels:
+      service: static
+      app: commerce-services

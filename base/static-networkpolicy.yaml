@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: commerce-services-static
+  labels:
+    service: static
+    app: commerce-services
+spec:
+  podSelector:
+    matchLabels:
+      service: static
+      app: commerce-services
+  policyTypes:
+  - Egress
+  egress:
+  # allow DNS resolution
+  - ports:
+    - port: 53
+      protocol: UDP
+    - port: 53
+      protocol: TCP
+  # we can define destination - to:
+    ports:
+    - protocol: TCP
+      port: 80

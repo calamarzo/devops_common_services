@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: commerce-services-static
+  labels:
+    service: static
+    app: commerce-services
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      service: static
+      app: commerce-services
+  template:
+    metadata:
+      labels:
+        service: static
+        app: commerce-services
+    spec:
+      terminationGracePeriodSeconds: 30
+      serviceAccountName: commerce-services-static
+      topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              service: static
+              app: commerce-services
+          maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+        - labelSelector:
+            matchLabels:
+              service: static
+              app: commerce-services
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+      containers:
+        - name: static
+          image: "nginxdemos/nginx-hello:latest"
+          imagePullPolicy: Always
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - "/usr/sbin/nginx -s quit"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 1Gi
+            requests:
+              cpu: 10m
+              memory: 512Mi

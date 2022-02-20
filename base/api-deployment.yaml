@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: commerce-services-api
+  labels:
+    service: api
+spec:
+  selector:
+    matchLabels:
+      service: api
+      app: commerce-services
+  template:
+    metadata:
+      labels:
+        service: api
+        app: commerce-services
+    spec:
+      terminationGracePeriodSeconds: 30
+      serviceAccountName: commerce-services-api
+      topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              service: api
+              app: commerce-services
+          maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+        - labelSelector:
+            matchLabels:
+              service: api
+              app: commerce-services
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+      containers:
+        - name: api
+          image: "nginxdemos/nginx-hello:latest"
+          imagePullPolicy: Always
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - "/usr/sbin/nginx -s quit"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 2Gi
+            requests:
+              cpu: 100m
+              memory: 1Gi

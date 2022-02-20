@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: commerce-services-static
+  labels:
+    service: static
+    app: commerce-services
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    service: static
+    app: commerce-services
